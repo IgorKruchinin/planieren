@@ -39,7 +39,7 @@ public:
         tmp.clear();
         std::vector<int> vec_time(3);
         for (auto &c: time) {
-            if (c != '.') {
+            if (c != ':') {
                 tmp += c;
             } else {
                 vec_time.push_back(std::stoi(tmp));
