@@ -6,7 +6,7 @@
 #define PLANIEREN_PLANIERENSTORAGE_H
 #include <string>
 #include <vector>
-#include <tuple>
+#include <fstream>
 
 class DateTime {
     struct Date {
@@ -50,11 +50,34 @@ public:
         time__.minutes_ = vec_time[1];
         time__.seconds_ = vec_time[2];
     }
+    DateTime(int day, int month, int year, int hour, int minute, int sec) {
+        date__.date_ = day;
+        date__.month_ = month;
+        date__.year_ = year;
+        time__.hours_ = hour;
+        time__.minutes_ = minute;
+        time__.seconds_ = sec;
+    }
 };
 
 class PlanierenStorage {
     DateTime datetime_;
     std::string task_;
+public:
+};
+
+class Profile {
+    std::string name_;
+    std::vector<PlanierenStorage> profiles_;
+    std::fstream file_;
+public:
+    Profile(const std::string& name) {
+        file_.open("profiles/" + name);
+        name_ = name;
+    }
+    ~Profile() {
+        file_.close();
+    }
 };
 
 
