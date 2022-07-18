@@ -71,14 +71,20 @@ class Profile {
     std::vector<PlanierenStorage> profiles_;
     std::fstream file_;
 public:
+#ifdef MIXED_STORAGE
     Profile(const std::string& name) {
         file_.open("profiles/" + name);
         name_ = name;
     }
+#else
+    Profile(const std::string& name) {
+        file_.open("profiles/planieren/" + name);
+        name_ = name;
+    }
+#endif
     ~Profile() {
         file_.close();
     }
 };
-
 
 #endif //PLANIEREN_PLANIERENSTORAGE_H
