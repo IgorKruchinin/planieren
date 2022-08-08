@@ -82,11 +82,17 @@ class Profile {
 public:
     Profile(const std::string& name)
         :name_(name), storage_(name){
-        storage_.create_ssec("tasks");
-        storage_.create_ssec("date");
-        storage_.create_ssec("time");
-        storage_.to_file();
-
+        if (!storage_.opened()) {
+            storage_.create_ssec("tasks");
+            storage_.create_ssec("date");
+            storage_.create_ssec("time");
+            storage_.to_file();
+        } else {
+            size_t size = storage_.gets("tasks").get_objects().size();
+            for (size_t i = 0; i < size; ++i) {
+                tasks_.emplace_back(storage_.gets("date")[i], storage_.gets("time")[i], storage_.gets("tasks")[i]);
+            }
+        }
     }
     void create_task(const std::string& date, const std::string& time, const std::string& task) {
         tasks_.emplace_back(date, time, task);
@@ -95,6 +101,9 @@ public:
         storage_.gets("date").add(tasks_[last_index].datetime_.date_to_string());
         storage_.gets("time").add(tasks_[last_index].datetime_.time_to_string());
         storage_.to_file();
+    }
+    std::vector<Task>& get_tasks() {
+        return tasks_;
     }
 };
 
