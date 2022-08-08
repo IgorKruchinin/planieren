@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
+//#include "macro_config.h"
+#include "USM/USM.h"
 
 class DateTime {
     struct Date {
@@ -58,32 +60,41 @@ public:
         time__.minutes_ = minute;
         time__.seconds_ = sec;
     }
+    std::string date_to_string() {
+        return std::to_string(date__.year_) + '.' + std::to_string(date__.month_) + '.' + std::to_string(date__.date_) ;
+    }
+    std::string time_to_string() {
+        return std::to_string(time__.hours_) + ':' + std::to_string(time__.minutes_) + ':' + std::to_string(time__.seconds_);
+    }
 };
 
-class PlanierenStorage {
+struct Task {
     DateTime datetime_;
     std::string task_;
-public:
+    Task(const std::string& date, const std::string& time, const std::string& task)
+        :datetime_(date, time), task_(task) {}
 };
 
 class Profile {
     std::string name_;
-    std::vector<PlanierenStorage> profiles_;
-    std::fstream file_;
+    std::vector<Task> tasks_;
+    ProfileStorage storage_;
 public:
-#ifdef MIXED_STORAGE
-    Profile(const std::string& name) {
-        file_.open("profiles/" + name);
-        name_ = name;
+    Profile(const std::string& name)
+        :name_(name), storage_(name){
+        storage_.create_ssec("tasks");
+        storage_.create_ssec("date");
+        storage_.create_ssec("time");
+        storage_.to_file();
+
     }
-#else
-    Profile(const std::string& name) {
-        file_.open("profiles/planieren/" + name);
-        name_ = name;
-    }
-#endif
-    ~Profile() {
-        file_.close();
+    void create_task(const std::string& date, const std::string& time, const std::string& task) {
+        tasks_.emplace_back(date, time, task);
+        size_t last_index = tasks_.size() - 1;
+        storage_.gets("tasks").add(tasks_[last_index].task_);
+        storage_.gets("date").add(tasks_[last_index].datetime_.date_to_string());
+        storage_.gets("time").add(tasks_[last_index].datetime_.time_to_string());
+        storage_.to_file();
     }
 };
 
